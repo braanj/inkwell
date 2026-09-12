@@ -1,0 +1,9 @@
+node_modules
+.nuxt
+.output
+.env
+dist
+playwright-report
+test-results
+.DS_Store
+supabase/.temp

@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run dev)",
+      "Bash(npm run build)",
+      "Bash(npm run test:e2e)",
+      "Bash(npm run test:e2e:ui)",
+      "Bash(npm run db:push)",
+      "Bash(npx playwright *)",
+      "Bash(npx supabase *)",
+      "Read(//supabase/**)",
+      "Read(//tests/**)"
+    ],
+    "deny": [
+      "Bash(npm run db:reset)",
+      "Read(.env)",
+      "Read(.env.*)"
+    ]
+  },
+  "env": {
+    "NUXT_PUBLIC_SITE_URL": "http://localhost:3000"
+  }
+}

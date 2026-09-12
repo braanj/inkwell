@@ -1,0 +1,125 @@
+<script setup lang="ts">
+definePageMeta({ middleware: 'auth' })
+
+const client = useSupabaseClient()
+const user = useSupabaseUser()
+
+const { data: publication, refresh: refreshPublication } = await useAsyncData('my-publication', async () => {
+  if (!user.value) return null
+  const { data, error } = await client
+    .from('publications')
+    .select('id, name, subdomain, description')
+    .eq('owner_id', user.value.id)
+    .maybeSingle()
+  if (error) throw error
+  return data
+})
+
+const { data: posts, refresh: refreshPosts } = await useAsyncData('my-posts', async () => {
+  if (!publication.value) return []
+  const { data, error } = await client
+    .from('posts')
+    .select('id, title, status, visibility, published_at, created_at')
+    .eq('publication_id', publication.value.id)
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return data
+}, { watch: [publication] })
+
+// --- create publication form state ---
+const name = ref('')
+const subdomain = ref('')
+const description = ref('')
+const createError = ref('')
+const creating = ref(false)
+
+async function createPublication() {
+  createError.value = ''
+  creating.value = true
+  const { data: { user: currentUser }, error: userError } = await client.auth.getUser()
+  if (userError || !currentUser) {
+    createError.value = 'Your session has expired — please sign in again.'
+    creating.value = false
+    return
+  }
+  const { error } = await client.from('publications').insert({
+    owner_id: currentUser.id,
+    name: name.value,
+    subdomain: subdomain.value.toLowerCase().trim(),
+    description: description.value || null
+  })
+  creating.value = false
+  if (error) {
+    createError.value = error.message.includes('duplicate') ? 'That subdomain is taken.' : error.message
+    return
+  }
+  await refreshPublication()
+  await refreshPosts()
+}
+</script>
+
+<template>
+  <div>
+    <SiteHeader />
+    <main class="max-w-3xl mx-auto px-4 py-12">
+      <template v-if="!publication">
+        <h1 class="font-display text-2xl mb-2">Set up your publication</h1>
+        <p class="text-ink/60 mb-6 text-sm">One publication per writer for now — you can add more later.</p>
+        <form class="space-y-4 max-w-md" @submit.prevent="createPublication">
+          <div>
+            <label for="name" class="block text-sm font-medium mb-1">Publication name</label>
+            <input id="name" v-model="name" data-testid="pub-name" required
+              class="w-full border border-line rounded px-3 py-2 bg-paper-raised" />
+          </div>
+          <div>
+            <label for="subdomain" class="block text-sm font-medium mb-1">URL slug</label>
+            <div class="flex items-center gap-1 text-sm text-ink/60">
+              <span>/p/</span>
+              <input id="subdomain" v-model="subdomain" data-testid="pub-subdomain" required pattern="[a-z0-9-]{3,40}"
+                class="flex-1 border border-line rounded px-3 py-2 bg-paper-raised text-ink" />
+            </div>
+          </div>
+          <div>
+            <label for="description" class="block text-sm font-medium mb-1">Description (optional)</label>
+            <textarea id="description" v-model="description" rows="2"
+              class="w-full border border-line rounded px-3 py-2 bg-paper-raised" />
+          </div>
+          <p v-if="createError" data-testid="pub-error" class="text-sm text-red-700">{{ createError }}</p>
+          <button type="submit" data-testid="pub-submit" :disabled="creating"
+            class="bg-teal text-paper px-4 py-2.5 rounded font-medium hover:bg-teal-dark disabled:opacity-60">
+            {{ creating ? 'Creating…' : 'Create publication' }}
+          </button>
+        </form>
+      </template>
+
+      <template v-else>
+        <div class="flex items-center justify-between mb-8">
+          <div>
+            <h1 class="font-display text-2xl">{{ publication.name }}</h1>
+            <NuxtLink :to="`/p/${publication.subdomain}`" class="text-sm text-teal">
+              View public page →
+            </NuxtLink>
+          </div>
+          <NuxtLink to="/dashboard/new-post" data-testid="new-post-link"
+            class="bg-teal text-paper px-4 py-2.5 rounded font-medium hover:bg-teal-dark">
+            New post
+          </NuxtLink>
+        </div>
+
+        <ul v-if="posts?.length" class="divide-y divide-line border-t border-b border-line" data-testid="posts-list">
+          <li v-for="post in posts" :key="post.id" class="py-4 flex items-center justify-between">
+            <div>
+              <NuxtLink :to="`/dashboard/posts/${post.id}`" class="font-medium hover:text-teal">
+                {{ post.title }}
+              </NuxtLink>
+              <p class="text-xs text-ink/50 mt-1 uppercase tracking-wide">
+                {{ post.status }} · {{ post.visibility }}
+              </p>
+            </div>
+          </li>
+        </ul>
+        <p v-else class="text-ink/60 text-sm">No posts yet. Write your first one.</p>
+      </template>
+    </main>
+  </div>
+</template>
