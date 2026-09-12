@@ -38,14 +38,14 @@ async function handleLogin() {
           <input id="password" v-model="password" data-testid="login-password" type="password" required
             class="w-full border border-line rounded px-3 py-2 bg-paper-raised" />
         </div>
-        <p v-if="error" data-testid="login-error" class="text-sm text-red-700">{{ error }}</p>
+        <p v-if="error" data-testid="login-error" class="text-sm text-error">{{ error }}</p>
         <button type="submit" data-testid="login-submit" :disabled="loading"
-          class="w-full bg-teal text-paper py-2.5 rounded font-medium hover:bg-teal-dark disabled:opacity-60">
+          class="w-full bg-blue text-paper py-2.5 rounded font-medium hover:bg-blue-dark disabled:opacity-60">
           {{ loading ? 'Signing in…' : 'Sign in' }}
         </button>
       </form>
       <p class="text-sm text-ink/60 mt-4">
-        No account yet? <NuxtLink to="/signup" class="text-teal">Start writing</NuxtLink>
+        No account yet? <NuxtLink to="/signup" class="text-blue">Start writing</NuxtLink>
       </p>
     </main>
   </div>

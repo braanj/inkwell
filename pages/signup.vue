@@ -56,14 +56,14 @@ async function handleSignup() {
           <input id="password" v-model="password" data-testid="signup-password" type="password" required minlength="8"
             class="w-full border border-line rounded px-3 py-2 bg-paper-raised" />
         </div>
-        <p v-if="error" data-testid="signup-error" class="text-sm text-red-700">{{ error }}</p>
+        <p v-if="error" data-testid="signup-error" class="text-sm text-error">{{ error }}</p>
         <button type="submit" data-testid="signup-submit" :disabled="loading"
-          class="w-full bg-teal text-paper py-2.5 rounded font-medium hover:bg-teal-dark disabled:opacity-60">
+          class="w-full bg-blue text-paper py-2.5 rounded font-medium hover:bg-blue-dark disabled:opacity-60">
           {{ loading ? 'Creating account…' : 'Create account' }}
         </button>
       </form>
       <p class="text-sm text-ink/60 mt-4">
-        Already have an account? <NuxtLink to="/login" class="text-teal">Sign in</NuxtLink>
+        Already have an account? <NuxtLink to="/login" class="text-blue">Sign in</NuxtLink>
       </p>
     </main>
   </div>

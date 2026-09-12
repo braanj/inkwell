@@ -32,7 +32,7 @@ function toggle(action: 'bold' | 'italic' | 'bulletList' | 'orderedList') {
 </script>
 
 <template>
-  <div class="border border-line rounded-lg overflow-hidden bg-paper-raised">
+  <div class="border border-line rounded overflow-hidden bg-paper-raised">
     <div class="flex gap-1 border-b border-line px-2 py-1.5" role="toolbar" aria-label="Formatting">
       <button type="button" data-testid="toolbar-bold" class="px-2 py-1 rounded hover:bg-paper font-semibold" @click="toggle('bold')">B</button>
       <button type="button" data-testid="toolbar-italic" class="px-2 py-1 rounded hover:bg-paper italic" @click="toggle('italic')">I</button>

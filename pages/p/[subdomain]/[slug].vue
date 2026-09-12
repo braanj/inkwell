@@ -49,16 +49,18 @@ const bodyHtml = computed(() => {
 <template>
   <div>
     <SiteHeader />
-    <main class="max-w-2xl mx-auto px-4 py-12">
-      <NuxtLink :to="`/p/${publication?.subdomain}`" class="text-sm text-teal">
+    <main class="max-w-3xl mx-auto px-4 py-12">
+      <NuxtLink :to="`/p/${publication?.subdomain}`" class="text-sm text-blue">
         ← {{ publication?.name }}
       </NuxtLink>
       <h1 class="font-display text-4xl mt-3 leading-tight">{{ post?.title }}</h1>
 
-      <div v-if="post?.is_locked" data-testid="paywall-card" class="mt-8 border border-line rounded-lg p-6 bg-paper-raised text-center">
+      <div v-if="post?.is_locked" data-testid="paywall-card"
+        class="mt-8 border border-line rounded p-6 bg-paper-raised text-center">
         <p class="font-display text-lg mb-2">This post is for subscribers</p>
         <p v-if="post.excerpt" class="text-sm text-ink/60 mb-4">{{ post.excerpt }}</p>
-        <NuxtLink :to="`/p/${publication?.subdomain}`" class="inline-block bg-teal text-paper px-4 py-2.5 rounded font-medium hover:bg-teal-dark">
+        <NuxtLink :to="`/p/${publication?.subdomain}`"
+          class="inline-block bg-blue text-paper px-4 py-2.5 rounded font-medium hover:bg-blue-dark">
           Subscribe to read
         </NuxtLink>
       </div>
@@ -69,7 +71,19 @@ const bodyHtml = computed(() => {
 </template>
 
 <style>
-.prose-post p { margin: 1em 0; line-height: 1.75; font-size: 1.05rem; }
-.prose-post ul { list-style: disc; padding-left: 1.4em; }
-.prose-post ol { list-style: decimal; padding-left: 1.4em; }
+.prose-post p {
+  margin: 1em 0;
+  line-height: 1.75;
+  font-size: 1.05rem;
+}
+
+.prose-post ul {
+  list-style: disc;
+  padding-left: 1.4em;
+}
+
+.prose-post ol {
+  list-style: decimal;
+  padding-left: 1.4em;
+}
 </style>

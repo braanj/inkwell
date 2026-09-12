@@ -10,17 +10,18 @@ export default <Partial<Config>>{
   theme: {
     extend: {
       colors: {
-        ink: '#1B1B18',
-        paper: '#EFEEE6',
-        'paper-raised': '#F8F7F2',
-        teal: { DEFAULT: '#1F6F63', dark: '#154C44' },
-        gold: '#C98A2C',
-        line: '#D9D7CC'
+        ink: '#111111',
+        paper: '#ffffff',
+        'paper-raised': '#f8f8fb',
+        blue: { DEFAULT: '#005a9c', dark: '#002a56' },
+        yellow: '#f9dc4a',
+        line: '#cac9c9',
+        error: '#a82615'
       },
       fontFamily: {
-        display: ['Fraunces', 'ui-serif', 'Georgia', 'serif'],
-        body: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        mono: ['"IBM Plex Mono"', 'ui-monospace', 'monospace']
+        display: ['"Noto Sans"', '"Trebuchet MS"', 'Geneva', 'sans-serif'],
+        body: ['"Noto Sans"', '"Trebuchet MS"', 'Geneva', 'sans-serif'],
+        mono: ['Monaco', '"Lucida Console"', '"Courier New"', 'monospace']
       }
     }
   },

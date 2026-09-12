@@ -25,7 +25,7 @@ const { data: publications } = await useAsyncData('publications', async () => {
       </p>
       <NuxtLink
         to="/signup"
-        class="inline-block mt-6 bg-teal text-paper px-5 py-2.5 rounded font-medium hover:bg-teal-dark transition-colors"
+        class="inline-block mt-6 bg-blue text-paper px-5 py-2.5 rounded font-medium hover:bg-blue-dark transition-colors"
       >
         Start writing — it's free
       </NuxtLink>
@@ -34,7 +34,7 @@ const { data: publications } = await useAsyncData('publications', async () => {
         <h2 class="font-display text-2xl mb-4">Recently published</h2>
         <ul v-if="publications?.length" class="divide-y divide-line border-t border-b border-line">
           <li v-for="pub in publications" :key="pub.id" class="py-4">
-            <NuxtLink :to="`/p/${pub.subdomain}`" class="font-medium hover:text-teal" data-testid="publication-link">
+            <NuxtLink :to="`/p/${pub.subdomain}`" class="font-medium hover:text-blue" data-testid="publication-link">
               {{ pub.name }}
             </NuxtLink>
             <p v-if="pub.description" class="text-sm text-ink/60 mt-1">{{ pub.description }}</p>

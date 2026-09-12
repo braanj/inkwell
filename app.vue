@@ -8,7 +8,7 @@
 </template>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&display=swap');
 
 html {
   scroll-behavior: smooth;
@@ -16,7 +16,7 @@ html {
 
 /* Visible keyboard focus everywhere, per design-system baseline */
 :focus-visible {
-  outline: 2px solid theme('colors.teal.DEFAULT');
+  outline: 3px solid theme('colors.yellow');
   outline-offset: 2px;
 }
 

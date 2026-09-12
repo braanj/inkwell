@@ -49,24 +49,27 @@ async function save(status?: 'draft' | 'published') {
 <template>
   <div v-if="post">
     <SiteHeader />
-    <main class="max-w-2xl mx-auto px-4 py-12">
+    <main class="max-w-3xl mx-auto px-4 py-12">
       <p class="text-xs uppercase tracking-wide text-ink/50 mb-2" data-testid="post-status">
         {{ post.status }}
       </p>
       <div class="space-y-4">
-        <input v-model="title" data-testid="post-title" class="w-full font-display text-3xl border-b border-line pb-2 bg-transparent focus:outline-none" />
-        <input v-model="excerpt" data-testid="post-excerpt" class="w-full text-sm border border-line rounded px-3 py-2 bg-paper-raised" />
+        <input v-model="title" data-testid="post-title"
+          class="w-full font-display text-3xl border-b border-line pb-2 bg-transparent focus:outline-none" />
+        <input v-model="excerpt" data-testid="post-excerpt"
+          class="w-full text-sm border border-line rounded px-3 py-2 bg-paper-raised" />
         <PostEditor v-model="body" />
 
         <div class="flex items-center gap-3 text-sm">
           <label class="font-medium">Visibility</label>
-          <select v-model="visibility" data-testid="post-visibility" class="border border-line rounded px-2 py-1 bg-paper-raised">
+          <select v-model="visibility" data-testid="post-visibility"
+            class="border border-line rounded px-2 py-1 bg-paper-raised">
             <option value="public">Public — anyone can read</option>
             <option value="subscribers">Subscribers only</option>
           </select>
         </div>
 
-        <p v-if="error" class="text-sm text-red-700">{{ error }}</p>
+        <p v-if="error" class="text-sm text-error">{{ error }}</p>
 
         <div class="flex gap-3">
           <button type="button" :disabled="saving" data-testid="save-changes"
@@ -75,15 +78,12 @@ async function save(status?: 'draft' | 'published') {
             Save changes
           </button>
           <button v-if="post.status === 'draft'" type="button" :disabled="saving" data-testid="publish-post"
-            class="bg-teal text-paper px-4 py-2.5 rounded font-medium hover:bg-teal-dark disabled:opacity-60"
+            class="bg-blue text-paper px-4 py-2.5 rounded font-medium hover:bg-blue-dark disabled:opacity-60"
             @click="save('published')">
             Publish
           </button>
-          <NuxtLink
-            v-if="post.status === 'published'"
-            :to="`/p/${post.publications.subdomain}/${post.slug}`"
-            class="self-center text-sm text-teal"
-          >
+          <NuxtLink v-if="post.status === 'published'" :to="`/p/${post.publications.subdomain}/${post.slug}`"
+            class="self-center text-sm text-blue">
             View live →
           </NuxtLink>
         </div>

@@ -84,9 +84,9 @@ async function createPublication() {
             <textarea id="description" v-model="description" rows="2"
               class="w-full border border-line rounded px-3 py-2 bg-paper-raised" />
           </div>
-          <p v-if="createError" data-testid="pub-error" class="text-sm text-red-700">{{ createError }}</p>
+          <p v-if="createError" data-testid="pub-error" class="text-sm text-error">{{ createError }}</p>
           <button type="submit" data-testid="pub-submit" :disabled="creating"
-            class="bg-teal text-paper px-4 py-2.5 rounded font-medium hover:bg-teal-dark disabled:opacity-60">
+            class="bg-blue text-paper px-4 py-2.5 rounded font-medium hover:bg-blue-dark disabled:opacity-60">
             {{ creating ? 'Creating…' : 'Create publication' }}
           </button>
         </form>
@@ -96,12 +96,12 @@ async function createPublication() {
         <div class="flex items-center justify-between mb-8">
           <div>
             <h1 class="font-display text-2xl">{{ publication.name }}</h1>
-            <NuxtLink :to="`/p/${publication.subdomain}`" class="text-sm text-teal">
+            <NuxtLink :to="`/p/${publication.subdomain}`" class="text-sm text-blue">
               View public page →
             </NuxtLink>
           </div>
           <NuxtLink to="/dashboard/new-post" data-testid="new-post-link"
-            class="bg-teal text-paper px-4 py-2.5 rounded font-medium hover:bg-teal-dark">
+            class="bg-blue text-paper px-4 py-2.5 rounded font-medium hover:bg-blue-dark">
             New post
           </NuxtLink>
         </div>
@@ -109,7 +109,7 @@ async function createPublication() {
         <ul v-if="posts?.length" class="divide-y divide-line border-t border-b border-line" data-testid="posts-list">
           <li v-for="post in posts" :key="post.id" class="py-4 flex items-center justify-between">
             <div>
-              <NuxtLink :to="`/dashboard/posts/${post.id}`" class="font-medium hover:text-teal">
+              <NuxtLink :to="`/dashboard/posts/${post.id}`" class="font-medium hover:text-blue">
                 {{ post.title }}
               </NuxtLink>
               <p class="text-xs text-ink/50 mt-1 uppercase tracking-wide">

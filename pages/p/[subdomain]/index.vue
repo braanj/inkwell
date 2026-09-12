@@ -62,30 +62,26 @@ const isSubscribed = computed(() => mySubscription.value?.status === 'active')
 <template>
   <div>
     <SiteHeader />
-    <main class="max-w-2xl mx-auto px-4 py-12">
+    <main class="max-w-3xl mx-auto px-4 py-12">
       <h1 class="font-display text-3xl">{{ publication?.name }}</h1>
       <p v-if="publication?.description" class="text-ink/70 mt-2">{{ publication.description }}</p>
 
-      <button
-        v-if="!isSubscribed"
-        type="button"
-        data-testid="subscribe-button"
-        :disabled="subscribing"
-        class="mt-5 bg-teal text-paper px-4 py-2.5 rounded font-medium hover:bg-teal-dark disabled:opacity-60"
-        @click="subscribe"
-      >
+      <button v-if="!isSubscribed" type="button" data-testid="subscribe-button" :disabled="subscribing"
+        class="mt-5 bg-blue text-paper px-4 py-2.5 rounded font-medium hover:bg-blue-dark disabled:opacity-60"
+        @click="subscribe">
         {{ subscribing ? 'Subscribing…' : 'Subscribe for free' }}
       </button>
-      <p v-else data-testid="subscribed-badge" class="mt-5 text-sm text-teal font-medium">
+      <p v-else data-testid="subscribed-badge" class="mt-5 text-sm text-blue font-medium">
         ✓ You're subscribed
       </p>
 
       <ul class="mt-10 divide-y divide-line border-t border-b border-line" data-testid="post-list">
         <li v-for="post in posts" :key="post.id" class="py-5">
-          <NuxtLink :to="`/p/${publication?.subdomain}/${post.slug}`" class="font-display text-xl hover:text-teal">
+          <NuxtLink :to="`/p/${publication?.subdomain}/${post.slug}`" class="font-display text-xl hover:text-blue">
             {{ post.title }}
           </NuxtLink>
-          <span v-if="post.visibility !== 'public'" class="ml-2 text-xs uppercase tracking-wide text-gold">
+          <span v-if="post.visibility !== 'public'"
+            class="ml-2 bg-yellow text-ink px-1.5 py-0.5 rounded text-xs uppercase tracking-wide font-medium">
             Subscribers
           </span>
           <p v-if="post.excerpt" class="text-sm text-ink/60 mt-1">{{ post.excerpt }}</p>

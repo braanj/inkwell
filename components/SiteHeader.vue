@@ -14,12 +14,12 @@ async function signOut() {
       <NuxtLink to="/" class="font-display text-xl tracking-tight">Inkwell</NuxtLink>
       <nav class="flex items-center gap-4 text-sm font-medium">
         <template v-if="user">
-          <NuxtLink to="/dashboard" class="hover:text-teal">Dashboard</NuxtLink>
-          <button type="button" class="hover:text-teal" @click="signOut">Sign out</button>
+          <NuxtLink to="/dashboard" class="hover:text-blue">Dashboard</NuxtLink>
+          <button type="button" class="hover:text-blue" @click="signOut">Sign out</button>
         </template>
         <template v-else>
-          <NuxtLink to="/login" class="hover:text-teal">Sign in</NuxtLink>
-          <NuxtLink to="/signup" class="bg-ink text-paper px-3 py-1.5 rounded hover:bg-teal-dark transition-colors">
+          <NuxtLink to="/login" class="hover:text-blue">Sign in</NuxtLink>
+          <NuxtLink to="/signup" class="bg-ink text-paper px-3 py-1.5 rounded hover:bg-blue-dark transition-colors">
             Start writing
           </NuxtLink>
         </template>
