@@ -1,30 +1,24 @@
 <script setup lang="ts">
 definePageMeta({ middleware: 'auth' })
 
-const client = useSupabaseClient()
-const user = useSupabaseUser()
+const { apiFetch } = useApi()
 
-const { data: publication, refresh: refreshPublication } = await useAsyncData('my-publication', async () => {
-  if (!user.value) return null
-  const { data, error } = await client
-    .from('publications')
-    .select('id, name, subdomain, description')
-    .eq('owner_id', user.value.id)
-    .maybeSingle()
-  if (error) throw error
-  return data
+type Publication = { id: string; name: string; subdomain: string; description: string | null }
+type PostSummary = { id: string; title: string; status: string; visibility: string; published_at: string | null; created_at: string }
+
+const { data: publication, refresh: refreshPublication } = await useAsyncData<Publication | null>('my-publication', () => {
+  return apiFetch<Publication | null>('/api/publications')
 })
 
-const { data: posts, refresh: refreshPosts } = await useAsyncData('my-posts', async () => {
+const { data: posts, refresh: refreshPosts } = await useAsyncData<PostSummary[]>('my-posts', async () => {
   if (!publication.value) return []
-  const { data, error } = await client
-    .from('posts')
-    .select('id, title, status, visibility, published_at, created_at')
-    .eq('publication_id', publication.value.id)
-    .order('created_at', { ascending: false })
-  if (error) throw error
-  return data
+  return apiFetch<PostSummary[]>(`/api/posts?publicationId=${publication.value.id}`)
 }, { watch: [publication] })
+
+function apiErrorMessage(err: unknown, fallback: string) {
+  const data = (err as { data?: { statusMessage?: string } })?.data
+  return data?.statusMessage ?? fallback
+}
 
 // --- create publication form state ---
 const name = ref('')
@@ -36,24 +30,39 @@ const creating = ref(false)
 async function createPublication() {
   createError.value = ''
   creating.value = true
-  const { data: { user: currentUser }, error: userError } = await client.auth.getUser()
-  if (userError || !currentUser) {
-    createError.value = 'Your session has expired — please sign in again.'
+  try {
+    await apiFetch('/api/publications', {
+      method: 'POST',
+      body: { name: name.value, subdomain: subdomain.value.toLowerCase().trim(), description: description.value || undefined }
+    })
+    await refreshPublication()
+    await refreshPosts()
+  } catch (err) {
+    createError.value = apiErrorMessage(err, 'Something went wrong')
+  } finally {
     creating.value = false
-    return
   }
-  const { error } = await client.from('publications').insert({
-    owner_id: currentUser.id,
-    name: name.value,
-    subdomain: subdomain.value.toLowerCase().trim(),
-    description: description.value || null
-  })
-  creating.value = false
-  if (error) {
-    createError.value = error.message.includes('duplicate') ? 'That subdomain is taken.' : error.message
-    return
+}
+
+// --- delete actions ---
+const deletingPublication = ref(false)
+
+async function deletePublication() {
+  if (!publication.value) return
+  if (!confirm('Delete this publication and all of its posts? This cannot be undone.')) return
+  deletingPublication.value = true
+  try {
+    await apiFetch(`/api/publications/${publication.value.id}`, { method: 'DELETE' })
+    await refreshPublication()
+    await refreshPosts()
+  } finally {
+    deletingPublication.value = false
   }
-  await refreshPublication()
+}
+
+async function deletePost(post: PostSummary) {
+  if (!confirm(`Delete "${post.title}"? This cannot be undone.`)) return
+  await apiFetch(`/api/posts/${post.id}`, { method: 'DELETE' })
   await refreshPosts()
 }
 </script>
@@ -100,10 +109,17 @@ async function createPublication() {
               View public page →
             </NuxtLink>
           </div>
-          <NuxtLink to="/dashboard/new-post" data-testid="new-post-link"
-            class="bg-blue text-paper px-4 py-2.5 rounded font-medium hover:bg-blue-dark">
-            New post
-          </NuxtLink>
+          <div class="flex items-center gap-3">
+            <NuxtLink to="/dashboard/new-post" data-testid="new-post-link"
+              class="bg-blue text-paper px-4 py-2.5 rounded font-medium hover:bg-blue-dark">
+              New post
+            </NuxtLink>
+            <button type="button" data-testid="delete-publication" :disabled="deletingPublication"
+              class="border border-line px-4 py-2.5 rounded font-medium text-error hover:bg-paper-raised disabled:opacity-60"
+              @click="deletePublication">
+              Delete publication
+            </button>
+          </div>
         </div>
 
         <ul v-if="posts?.length" class="divide-y divide-line border-t border-b border-line" data-testid="posts-list">
@@ -116,6 +132,10 @@ async function createPublication() {
                 {{ post.status }} · {{ post.visibility }}
               </p>
             </div>
+            <button type="button" data-testid="delete-post" class="text-sm text-error hover:underline"
+              @click="deletePost(post)">
+              Delete
+            </button>
           </li>
         </ul>
         <p v-else class="text-ink/60 text-sm">No posts yet. Write your first one.</p>

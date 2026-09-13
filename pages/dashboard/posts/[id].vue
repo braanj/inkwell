@@ -2,16 +2,22 @@
 definePageMeta({ middleware: 'auth' })
 
 const route = useRoute()
-const client = useSupabaseClient()
+const { apiFetch } = useApi()
 
-const { data: post, refresh } = await useAsyncData(`post-${route.params.id}`, async () => {
-  const { data, error } = await client
-    .from('posts')
-    .select('id, title, slug, excerpt, body, visibility, status, publication_id, publications(subdomain, name)')
-    .eq('id', route.params.id)
-    .single()
-  if (error) throw error
-  return data
+type Post = {
+  id: string
+  title: string
+  slug: string
+  excerpt: string | null
+  body: Record<string, unknown>
+  visibility: string
+  status: string
+  publication_id: string
+  publications: { subdomain: string; name: string }
+}
+
+const { data: post, refresh } = await useAsyncData(`post-${route.params.id}`, () => {
+  return apiFetch<Post>(`/api/posts/${route.params.id}`)
 })
 
 const title = ref(post.value?.title ?? '')
@@ -19,6 +25,7 @@ const excerpt = ref(post.value?.excerpt ?? '')
 const visibility = ref(post.value?.visibility ?? 'public')
 const body = ref(post.value?.body ?? {})
 const saving = ref(false)
+const deleting = ref(false)
 const error = ref('')
 
 async function save(status?: 'draft' | 'published') {
@@ -30,19 +37,29 @@ async function save(status?: 'draft' | 'published') {
     visibility: visibility.value,
     body: body.value
   }
-  if (status) {
-    patch.status = status
-    if (status === 'published' && post.value?.status !== 'published') {
-      patch.published_at = new Date().toISOString()
-    }
+  if (status) patch.status = status
+
+  try {
+    await apiFetch(`/api/posts/${route.params.id}`, { method: 'PATCH', body: patch })
+    await refresh()
+  } catch (err) {
+    const data = (err as { data?: { statusMessage?: string } })?.data
+    error.value = data?.statusMessage ?? 'Something went wrong'
+  } finally {
+    saving.value = false
   }
-  const { error: saveError } = await client.from('posts').update(patch).eq('id', route.params.id)
-  saving.value = false
-  if (saveError) {
-    error.value = saveError.message
-    return
+}
+
+async function deletePost() {
+  if (!post.value) return
+  if (!confirm(`Delete "${post.value.title}"? This cannot be undone.`)) return
+  deleting.value = true
+  try {
+    await apiFetch(`/api/posts/${route.params.id}`, { method: 'DELETE' })
+    await navigateTo('/dashboard')
+  } finally {
+    deleting.value = false
   }
-  await refresh()
 }
 </script>
 
@@ -71,7 +88,7 @@ async function save(status?: 'draft' | 'published') {
 
         <p v-if="error" class="text-sm text-error">{{ error }}</p>
 
-        <div class="flex gap-3">
+        <div class="flex items-center gap-3">
           <button type="button" :disabled="saving" data-testid="save-changes"
             class="border border-line px-4 py-2.5 rounded font-medium hover:bg-paper-raised disabled:opacity-60"
             @click="save()">
@@ -86,6 +103,11 @@ async function save(status?: 'draft' | 'published') {
             class="self-center text-sm text-blue">
             View live →
           </NuxtLink>
+          <button type="button" :disabled="deleting" data-testid="delete-post"
+            class="ml-auto text-sm text-error hover:underline disabled:opacity-60"
+            @click="deletePost">
+            Delete post
+          </button>
         </div>
       </div>
     </main>

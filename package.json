@@ -22,6 +22,7 @@
     "typescript": "^5.5.0"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.112.3",
     "@tiptap/extension-image": "^2.6.0",
     "@tiptap/extension-link": "^2.6.0",
     "@tiptap/extension-underline": "^2.27.3",

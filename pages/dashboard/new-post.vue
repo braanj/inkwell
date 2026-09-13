@@ -1,17 +1,12 @@
 <script setup lang="ts">
 definePageMeta({ middleware: 'auth' })
 
-const client = useSupabaseClient()
-const user = useSupabaseUser()
+const { apiFetch } = useApi()
 
-const { data: publication } = await useAsyncData('my-publication-for-new-post', async () => {
-  const { data, error } = await client
-    .from('publications')
-    .select('id')
-    .eq('owner_id', user.value!.id)
-    .maybeSingle()
-  if (error) throw error
-  return data
+type Publication = { id: string; name: string; subdomain: string; description: string | null }
+
+const { data: publication } = await useAsyncData<Publication | null>('my-publication-for-new-post', () => {
+  return apiFetch<Publication | null>('/api/publications')
 })
 
 if (!publication.value) {
@@ -25,10 +20,6 @@ const body = ref<Record<string, unknown>>({})
 const saving = ref(false)
 const error = ref('')
 
-function slugify(input: string) {
-  return input.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
-}
-
 async function save(status: 'draft' | 'published') {
   error.value = ''
   if (!title.value.trim()) {
@@ -36,26 +27,25 @@ async function save(status: 'draft' | 'published') {
     return
   }
   saving.value = true
-  const { data, error: saveError } = await client
-    .from('posts')
-    .insert({
-      publication_id: publication.value!.id,
-      title: title.value,
-      slug: slugify(title.value) || crypto.randomUUID().slice(0, 8),
-      excerpt: excerpt.value || null,
-      body: body.value,
-      visibility: visibility.value,
-      status,
-      published_at: status === 'published' ? new Date().toISOString() : null
+  try {
+    const data = await apiFetch<{ id: string }>('/api/posts', {
+      method: 'POST',
+      body: {
+        publicationId: publication.value!.id,
+        title: title.value,
+        excerpt: excerpt.value || undefined,
+        body: body.value,
+        visibility: visibility.value,
+        status
+      }
     })
-    .select('id')
-    .single()
-  saving.value = false
-  if (saveError) {
-    error.value = saveError.message
-    return
+    navigateTo(`/dashboard/posts/${data.id}`)
+  } catch (err) {
+    const data = (err as { data?: { statusMessage?: string } })?.data
+    error.value = data?.statusMessage ?? 'Something went wrong'
+  } finally {
+    saving.value = false
   }
-  navigateTo(`/dashboard/posts/${data.id}`)
 }
 </script>
 
