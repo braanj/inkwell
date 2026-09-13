@@ -1,8 +1,5 @@
 <script setup lang="ts">
 import { generateHTML } from '@tiptap/vue-3'
-import StarterKit from '@tiptap/starter-kit'
-import Link from '@tiptap/extension-link'
-import ImageExt from '@tiptap/extension-image'
 
 const route = useRoute()
 const client = useSupabaseClient()
@@ -39,7 +36,7 @@ if (!post.value) {
 const bodyHtml = computed(() => {
   if (!post.value?.body) return ''
   try {
-    return generateHTML(post.value.body as any, [StarterKit, Link, ImageExt])
+    return generateHTML(post.value.body as any, createTiptapExtensions())
   } catch {
     return ''
   }
@@ -86,4 +83,15 @@ const bodyHtml = computed(() => {
   list-style: decimal;
   padding-left: 1.4em;
 }
+
+.prose-post h1 { font-family: theme('fontFamily.display'); font-size: 2em; margin: 1em 0 0.5em; line-height: 1.25; }
+.prose-post h2 { font-family: theme('fontFamily.display'); font-size: 1.5em; margin: 1em 0 0.5em; line-height: 1.3; }
+.prose-post h3 { font-family: theme('fontFamily.display'); font-size: 1.2em; margin: 1em 0 0.5em; line-height: 1.35; }
+.prose-post blockquote { border-left: 3px solid theme('colors.line'); padding-left: 1em; margin: 1.5em 0; font-style: italic; color: rgb(17 17 17 / 70%); }
+.prose-post code { font-family: theme('fontFamily.mono'); background: theme('colors.paper-raised'); border-radius: 0.25em; padding: 0.1em 0.35em; font-size: 0.9em; }
+.prose-post pre { font-family: theme('fontFamily.mono'); background: theme('colors.paper-raised'); border-radius: 0.375em; padding: 1em 1.25em; overflow-x: auto; margin: 1.5em 0; }
+.prose-post pre code { background: none; padding: 0; }
+.prose-post hr { border: none; border-top: 1px solid theme('colors.line'); margin: 2em 0; }
+.prose-post img { max-width: 100%; height: auto; border-radius: 0.375em; margin: 1.5em 0; }
+.prose-post a { color: theme('colors.blue.DEFAULT'); text-decoration: underline; }
 </style>

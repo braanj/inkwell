@@ -69,7 +69,7 @@ async function save(status: 'draft' | 'published') {
           class="w-full font-display text-3xl border-b border-line pb-2 bg-transparent focus:outline-none" />
         <input v-model="excerpt" data-testid="post-excerpt" placeholder="One-line excerpt (shown to non-subscribers)"
           class="w-full text-sm border border-line rounded px-3 py-2 bg-paper-raised" />
-        <PostEditor v-model="body" />
+        <PostEditor v-model="body" :publication-id="publication?.id ?? ''" />
 
         <div class="flex items-center gap-3 text-sm">
           <label class="font-medium">Visibility</label>
